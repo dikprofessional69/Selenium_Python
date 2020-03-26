@@ -1,0 +1,46 @@
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.keys import Keys
+import os
+
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
+
+
+def single_tab(song_name, driver):
+    song = song_name
+    browser = driver
+    url_template = "https://www.youtube.com/results?search_query={}"
+    search_url = url_template.format(song)
+    browser.get(search_url)
+    video = browser.find_element_by_id("img")
+    video.click()#here error sometimes
+    video_url = browser.current_url
+    print(video_url)
+    browser.get("https://ytmp3.cc/en13/")
+    search_box = browser.find_element_by_id("input")
+    search_box.send_keys(video_url + Keys.RETURN)
+    download_element_flag = False
+    while not download_element_flag:
+        try:
+            download = browser.find_element_by_partial_link_text("Download")
+            download_element_flag = True
+        except NoSuchElementException:
+            print("Page Loading")
+
+    download.click()
+    try:
+        WebDriverWait(driver, 5).until(expected_conditions.new_window_is_opened)
+        driver.switch_to.window(driver.window_handles[1])
+        driver.close()
+    except:
+        print("NO AD HURRAH")
+    finally:
+        pass
+    # driver.close()
+
+
+driver = webdriver.Chrome()
+single_tab("Plain White T's - Hey There Delilah (Official Video)", driver)
+single_tab("twenty one pilots - Can't Help Falling In Love (Elvis Cover)", driver)
+single_tab("Pink Floyd - Wish You Were Here (Eternal Sunshine of the Spotless Mind) [HD]",driver)
