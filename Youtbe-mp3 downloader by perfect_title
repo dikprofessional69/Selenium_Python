@@ -1,0 +1,38 @@
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.keys import Keys
+import os
+
+song = "Shinsuke Nakamura - The Rising Sun feat. Lee England Jr."  # can handle ""inside
+#here above title must be perfect to be handled by os later can scrape this
+browser = webdriver.Chrome()
+url_template = "https://www.youtube.com/results?search_query={}"
+search_url = url_template.format(song)
+browser.get(search_url)
+video = browser.find_element_by_id("img")
+video.click()  # sometimes error on this line
+# after clicking this url automatically updates so no need sleep
+video_url = browser.current_url
+print(video_url)
+browser.get("https://ytmp3.cc/en13/")
+search_box = browser.find_element_by_id("input")
+search_box.send_keys(video_url + Keys.RETURN)
+# element = WebDriverWait(browser, 10).until(
+#     expected_conditions.presence_of_element_located((By.ID, "Download"))
+# )
+download_element_flag = False
+while not download_element_flag:
+    try:
+        download = browser.find_element_by_partial_link_text("Download")
+        download_element_flag = True
+    except NoSuchElementException:
+        print("please wait")
+
+download.click()
+location_of_file = r'C:\Users\ZinonYT\Downloads\{}.mp3'
+while (True):
+    print("Downloading:", location_of_file.format(song))
+    if os.path.isfile(location_of_file.format(song)):
+        break
+
+browser.close()
