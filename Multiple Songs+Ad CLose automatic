@@ -31,8 +31,8 @@ def single_tab(song_name, driver):
     download.click()
     try:
         WebDriverWait(driver, 5).until(expected_conditions.new_window_is_opened)
-        driver.switch_to.window(driver.window_handles[1])
-        driver.close()
+        browser.switch_to.window(browser.window_handles[1])
+        browser.close()
     except:
         print("NO AD HURRAH")
     finally:
