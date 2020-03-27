@@ -1,0 +1,12 @@
+import selenium
+from selenium import webdriver
+
+browser = webdriver.Chrome()
+playlist_template="https://www.youtube.com/playlist?list={}"
+playlist_id="PLXszzEc_1_nkobxa_6Xe9SDKhy1dW2k15"
+playlist_template_url=playlist_template.format(playlist_id)
+
+browser.get(playlist_template_url)
+videos=browser.find_elements_by_xpath('/html/body/ytd-app/div/ytd-page-manager/ytd-browse/ytd-playlist-sidebar-renderer/div/ytd-playlist-sidebar-primary-info-renderer/div[1]/yt-formatted-string[1]')
+print(videos)
+print(videos[0].text)
