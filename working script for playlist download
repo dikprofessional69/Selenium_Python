@@ -1,0 +1,81 @@
+urldownloader.py:
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
+from downloader import single_tab
+
+
+def open_link(url_id):
+    browser = webdriver.Chrome()
+    url_template = "https://www.youtube.com/playlist?list={}"
+    search_url = url_template.format(url_id)
+    browser.get(search_url)
+    play = browser.find_element_by_xpath(
+        "/html/body/ytd-app/div/ytd-page-manager/ytd-browse/ytd-playlist-sidebar-renderer/div/ytd-playlist-sidebar-primary-info-renderer/ytd-playlist-thumbnail/a/div[2]/ytd-thumbnail-overlay-side-panel-renderer/yt-formatted-string")
+    play.click()
+    title_xpath = r'//*[@id="video-title"]'
+    videonames = list()
+    try:
+        WebDriverWait(browser, 10).until(expected_conditions.presence_of_all_elements_located((By.XPATH, title_xpath)))
+        videos = browser.find_elements_by_xpath(title_xpath)
+        for video in videos:
+            videonames.append(video.text)
+
+    except:
+        print("title not found")
+
+    finally:
+        print(videonames)
+        browser.close()
+        brw = list(map(single_tab,videonames))
+        return brw
+
+
+Browser = list(open_link("PLXszzEc_1_nkobxa_6Xe9SDKhy1dW2k15"))
+
+-----------------------------------------------------------------------------------------------------------------
+downloader.py
+
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.keys import Keys
+
+
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
+
+
+def single_tab(song_name):
+    song = song_name
+    browser = webdriver.Chrome()
+    url_template = "https://www.youtube.com/results?search_query={}"
+    search_url = url_template.format(song)
+    browser.get(search_url)
+    video = browser.find_element_by_id("img")
+    video.click()#here error sometimes
+    video_url = browser.current_url
+    print(video_url)
+    browser.get("https://ytmp3.cc/en13/")
+    search_box = browser.find_element_by_id("input")
+    search_box.send_keys(video_url + Keys.RETURN)
+    download_element_flag = False
+    while not download_element_flag:
+        try:
+            download = browser.find_element_by_partial_link_text("Download")
+            download_element_flag = True
+        except NoSuchElementException:
+            print("Page Loading")
+
+    download.click()
+    try:
+        WebDriverWait(browser, 5).until(expected_conditions.new_window_is_opened)
+        browser.switch_to.window(browser.window_handles[1])
+        browser.close()
+    except:
+        print("NO AD HURRAH")
+    finally:
+        return browser
+    # driver.close()
+
+
